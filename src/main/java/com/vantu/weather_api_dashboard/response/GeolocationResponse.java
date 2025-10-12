@@ -1,4 +1,4 @@
-package com.vantu.weather_api_dashboard.model;
+package com.vantu.weather_api_dashboard.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Location {
+public class GeolocationResponse {
 	private String cityName;
 	private String regionName;
 	private String countryName;

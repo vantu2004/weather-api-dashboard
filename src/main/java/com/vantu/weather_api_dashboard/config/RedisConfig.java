@@ -38,7 +38,7 @@ public class RedisConfig {
 		}
 		config.setPassword(redisPassword);
 
-		// ❌ KHÔNG DÙNG SSL vì server không hỗ trợ
+		// KHÔNG DÙNG SSL vì server không hỗ trợ
 		LettuceClientConfiguration clientConfig = LettuceClientConfiguration.builder()
 				.commandTimeout(Duration.ofSeconds(5)).build();
 

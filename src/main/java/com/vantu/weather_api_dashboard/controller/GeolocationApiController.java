@@ -5,7 +5,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.vantu.weather_api_dashboard.model.Location;
+import com.vantu.weather_api_dashboard.response.ApiResponse;
+import com.vantu.weather_api_dashboard.response.GeolocationResponse;
 import com.vantu.weather_api_dashboard.service.GeolocationService;
 import com.vantu.weather_api_dashboard.util.IpAddress;
 
@@ -21,7 +22,7 @@ public class GeolocationApiController {
 	@GetMapping
 	public ResponseEntity<?> getLocationByIpAddress(HttpServletRequest request) {
 		String ipAddress = IpAddress.getIpAddress(request);
-		Location location = this.geolocationService.getLocationByIp2Location(ipAddress);
+		ApiResponse<GeolocationResponse> location = this.geolocationService.getLocationByIp2Location(ipAddress);
 
 		return ResponseEntity.ok(location);
 	}

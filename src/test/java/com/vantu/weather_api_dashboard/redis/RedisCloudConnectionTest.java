@@ -1,4 +1,4 @@
-package com.vantu.weather_api_dashboard;
+package com.vantu.weather_api_dashboard.redis;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -18,5 +18,7 @@ class RedisCloudConnectionTest {
 		redisTemplate.opsForValue().set("test:key", "hello-redis-cloud");
 		String value = (String) redisTemplate.opsForValue().get("test:key");
 		assertEquals("hello-redis-cloud", value);
+		
+		System.out.println(value);
 	}
 }
