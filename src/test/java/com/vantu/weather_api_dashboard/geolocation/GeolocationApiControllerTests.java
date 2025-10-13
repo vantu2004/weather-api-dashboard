@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.time.Instant;
 
 @WebMvcTest(GeolocationApiController.class)
-class GeolocationApiControllerTests {
+public class GeolocationApiControllerTests {
 
 	@Autowired
 	private MockMvc mockMvc;

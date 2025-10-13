@@ -25,7 +25,7 @@ import com.vantu.weather_api_dashboard.response.GeocodingResponse;
 import com.vantu.weather_api_dashboard.service.GeocodingService;
 
 @WebMvcTest(GeocodingApiController.class)
-class GeocodingApiControllerTests {
+public class GeocodingApiControllerTests {
 
 	@Autowired
 	private MockMvc mockMvc;
