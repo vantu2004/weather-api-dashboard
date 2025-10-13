@@ -7,7 +7,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import com.vantu.weather_api_dashboard.client.OpenWeatherClient;
+import com.vantu.weather_api_dashboard.client.GeocodingClient;
 import com.vantu.weather_api_dashboard.exception.GeocodingException;
 import com.vantu.weather_api_dashboard.response.GeocodingResponse;
 import com.vantu.weather_api_dashboard.response.ApiResponse;
@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class GeocodingService {
 	private final CacheService cacheService;
-	private final OpenWeatherClient openWeatherClient;
+	private final GeocodingClient openWeatherClient;
 
 	public ApiResponse<GeocodingResponse> getByCity(String city) {
 		long start = System.nanoTime();
