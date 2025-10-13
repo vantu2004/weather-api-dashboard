@@ -47,8 +47,9 @@ public class GeolocationService {
 				throw new GeolocationException("Geolocation Failed: " + ipResult.getStatus());
 			}
 
-			GeolocationResponse location = GeolocationResponse.builder().cityName(ipResult.getCity()).regionName(ipResult.getRegion())
-					.countryName(ipResult.getCountryLong()).countryCode(ipResult.getCountryShort()).build();
+			GeolocationResponse location = GeolocationResponse.builder().cityName(ipResult.getCity())
+					.regionName(ipResult.getRegion()).countryName(ipResult.getCountryLong())
+					.countryCode(ipResult.getCountryShort()).build();
 
 			long durationMs = (System.nanoTime() - start) / 1_000_000;
 
@@ -63,4 +64,19 @@ public class GeolocationService {
 			throw new GeolocationException("Error querying IP2Location database", e);
 		}
 	}
+
+	public void testDatabase() {
+		if (ip2Location == null) {
+			throw new RuntimeException("IP2Location database not initialized");
+		}
+		try {
+			IPResult result = ip2Location.IPQuery("8.8.8.8");
+			if (!"OK".equals(result.getStatus())) {
+				throw new RuntimeException("IP2Location query failed: " + result.getStatus());
+			}
+		} catch (Exception e) {
+			throw new RuntimeException("IP2Location DB test failed", e);
+		}
+	}
+
 }

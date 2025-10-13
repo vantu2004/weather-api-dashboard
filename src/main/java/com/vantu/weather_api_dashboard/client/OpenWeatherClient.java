@@ -41,4 +41,10 @@ public class OpenWeatherClient {
 		String url = String.format(OpenWeatherUrl.ALERTS_URL, lat, lon, apiKey);
 		return restTemplate.getForObject(url, WeatherResponse.class);
 	}
+
+	public void healthCheck() {
+		String url = "https://api.openweathermap.org/data/2.5/weather?q=London&appid=" + apiKey;
+		new RestTemplate().getForObject(url, String.class); // chỉ cần request là đủ
+	}
+
 }

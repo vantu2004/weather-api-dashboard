@@ -97,4 +97,16 @@ public class GeocodingService {
 	private String normalize(String city) {
 		return city.trim().toLowerCase().replaceAll("\\s+", "_");
 	}
+
+	public void selfCheck() {
+		try {
+			List<GeocodingResponse> result = openWeatherClient.direct("London");
+			if (result == null || result.isEmpty()) {
+				throw new RuntimeException("Geocoding API returned empty");
+			}
+		} catch (Exception e) {
+			throw new RuntimeException("Geocoding API check failed", e);
+		}
+	}
+
 }
