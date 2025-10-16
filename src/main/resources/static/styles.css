@@ -1,0 +1,142 @@
+:root {
+    /* Palette centered around rgb(81,158,200) */
+    --brand: rgb(81 158 200);
+    --brand-dark: rgb(60 130 170);
+    --brand-light: rgb(166 210 233);
+    /* Darker main card surface for better readability */
+    --panel: rgba(60,130,170,0.88);
+    --muted: #e6edf7;
+    --text: #ffffff;
+    --accent: #eaf6ff;
+    --accent-2: #22c55e;
+    --danger: #f87171;
+    --border: rgba(255,255,255,0.28);
+    --code-bg: rgba(0,0,0,0.35);
+}
+
+* {
+	box-sizing: border-box;
+}
+
+html, body {
+	height: 100%;
+}
+
+body {
+	margin: 0;
+	font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+	color: var(--text);
+    /* Gradient based on rgb(81,158,200) */
+    background: linear-gradient(180deg, var(--brand-light) 0%, var(--brand) 55%, var(--brand-dark) 100%);
+}
+
+.app-header, .app-footer {
+	padding: 16px 24px;
+	background: transparent;
+	border-bottom: 1px solid transparent;
+}
+
+.app-footer {
+	border-top: 1px solid var(--border);
+	border-bottom: none;
+	text-align: center;
+	padding: 8px 16px;
+	font-size: 14px;
+}
+
+.app-header h1 {
+	margin: 0 0 4px 0;
+	font-weight: 700;
+}
+
+.app-header p {
+	margin: 0;
+	color: var(--muted);
+}
+
+.container {
+	max-width: 780px;
+	margin: 32px auto;
+	padding: 0 16px;
+    /* Make main area taller so footer is shorter */
+    min-height: calc(100vh - 160px);
+}
+
+/* Search */
+.search-row { display: grid; gap: 12px; }
+.search { display: grid; grid-template-columns: minmax(260px, 1fr) 140px auto; gap: 8px; }
+.search input {
+	padding: 12px 14px;
+	border-radius: 16px;
+	border: 1px solid var(--border);
+	background: rgba(255,255,255,0.22);
+	color: var(--text);
+	outline: none;
+}
+.search input[type=number] {
+	text-align: center;
+	color: var(--text);
+}
+.search #daysInput { width: 140px; }
+.search input::placeholder { color: rgba(255,255,255,0.75); }
+
+/* Hide number spinners for a cleaner look */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+input[type=number] {
+	-moz-appearance: textfield;
+}
+.search button {
+	padding: 12px 14px;
+	border-radius: 16px;
+	border: 1px solid var(--border);
+	background: rgba(255,255,255,0.28);
+	color: #0b1220;
+	cursor: pointer;
+}
+
+/* Card */
+.card { margin: 24px auto 0; background: var(--panel); border: 1px solid var(--border); border-radius: 24px; backdrop-filter: blur(10px); max-width: 720px; box-shadow: 0 24px 48px rgba(12, 44, 68, 0.35); min-height: 420px; }
+ .card-header { display: flex; justify-content: space-between; align-items: flex-start; padding: 20px; border-bottom: 1px solid var(--border); }
+.city-time .city { font-weight: 700; }
+.city-time .date { color: var(--muted); font-size: 13px; }
+.temp-now { text-align: right; }
+.temp-now .temp { font-size: 44px; font-weight: 800; }
+.temp-now .condition { color: var(--muted); }
+.card-body { display: grid; grid-template-columns: 100px 1fr; gap: 18px; padding: 28px 20px; }
+.icon { font-size: 56px; line-height: 1; }
+.metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.metric { background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.25); border-radius: 14px; padding: 14px; }
+.metric span { color: var(--muted); font-size: 12px; }
+.metric strong { display: block; margin-top: 2px; font-size: 16px; }
+.forecast { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 0 16px 16px 16px; }
+.forecast .day { background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.25); border-radius: 14px; padding: 10px; text-align: center; }
+.forecast .day .d { color: var(--muted); font-size: 12px; }
+.forecast .day .t { font-weight: 700; }
+
+.status {
+	margin: 16px 0;
+	min-height: 24px;
+	color: var(--muted);
+}
+
+/* Old JSON view styles retained below if needed */
+
+.sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+@media (max-width: 640px) { .container { max-width: 100%; } }
+
+
