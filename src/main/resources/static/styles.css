@@ -140,3 +140,9 @@ input[type=number] {
 @media (max-width: 640px) { .container { max-width: 100%; } }
 
 
+.hourly { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(120px, 1fr); gap: 8px; padding: 0 16px 16px 16px; overflow-x: auto; scrollbar-width: thin; }
+.hourly .hour { background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.25); border-radius: 14px; padding: 10px; text-align: center; min-width: 120px; }
+.hourly .hour .h { color: var(--muted); font-size: 12px; }
+.hourly .hour .t { font-weight: 700; }
+
+

@@ -11,7 +11,7 @@
         <section class="search-row">
             <div class="search">
                 <input id="cityInput" type="text" placeholder="Search city..." />
-				<input id="daysInput" type="number" min="1" max="7" value="3" placeholder="Số ngày (1–7)" aria-label="Số ngày dự báo (1–7)" title="Số ngày dự báo (1–7)" />
+				<input id="daysInput" type="number" min="1" max="7" value="" placeholder="Số ngày (1–7)" aria-label="Số ngày dự báo (1–7)" title="Số ngày dự báo (1–7)" />
                 <button id="searchBtn" aria-label="Search">🔍</button>
             </div>
             <span id="statusText" class="status"></span>
@@ -41,6 +41,10 @@
                         <strong id="windNow">-- m/s</strong>
                     </div>
                 </div>
+            </div>
+
+            <div class="hourly" id="hourlyRow" aria-label="Dự báo theo giờ">
+                <!-- hourly items inserted by JS -->
             </div>
 
             <div class="forecast" id="forecastRow">

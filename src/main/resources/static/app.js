@@ -13,6 +13,7 @@
 	const humidityNow = document.getElementById("humidityNow");
 	const windNow = document.getElementById("windNow");
 	const forecastRow = document.getElementById("forecastRow");
+	const hourlyRow = document.getElementById("hourlyRow");
 
 	function setStatus(message, type = "info") {
 		statusText.textContent = message || "";
@@ -50,6 +51,22 @@
 		return d.toUTCString().slice(0, 16);
 	}
 
+	function formatHourLabel(ts, tzOffsetSeconds) {
+		const ms = (ts + tzOffsetSeconds) * 1000;
+		const d = new Date(ms);
+		const h = d.getUTCHours();
+		if (h === 0) return "12h đêm";
+		if (h < 12) return `${h}h sáng`;
+		if (h === 12) return "12h trưa";
+		if (h < 18) return `${h - 12}h chiều`;
+		return `${h - 12}h tối`;
+	}
+
+	function formatHour24(ts, tzOffsetSeconds) {
+		const ms = (ts + tzOffsetSeconds) * 1000;
+		return new Date(ms).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' });
+	}
+
 	function renderCurrent(api) {
 		const data = api.data; // ApiResponse<WeatherResponse>
 		const { current, timezone_offset: tzOff } = normalizeKeys(data);
@@ -84,6 +101,25 @@ function renderDaily(api) {
 		});
 	}
 
+	function renderHourly(api) {
+		const data = api.data;
+		const { hourly, timezone_offset: tzOff } = normalizeKeys(data);
+		if (!Array.isArray(hourly)) return;
+		hourlyRow.innerHTML = "";
+		// Show next 12 hours
+		hourly.slice(0, 12).forEach((h) => {
+			const item = document.createElement("div");
+			item.className = "hour";
+			const w = (h.weather && h.weather[0]) || {};
+			item.innerHTML = `
+				<div class="h">${formatHour24(h.dt, tzOff || data.timezoneOffset || 0)}</div>
+				<div>${pickIcon(w.id, w.main)}</div>
+				<div class="t">${Math.round(h.temp)}°C</div>
+			`;
+			hourlyRow.appendChild(item);
+		});
+	}
+
 	function normalizeKeys(obj) {
 		// Convert camel to snake fallback handling when needed
 		return new Proxy(obj, {
@@ -103,36 +139,125 @@ function renderDaily(api) {
 
 function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
 
-	async function search() {
-		const city = (cityInput.value || "").trim();
-		if (!city) {
-			setStatus("Vui lòng nhập tên thành phố.", "error");
-			cityInput.focus();
-			return;
+	function validateCityName(city) {
+		const errors = [];
+		
+		// Debug log để kiểm tra
+		console.log("Validating city:", city);
+		
+		// Kiểm tra số trước
+		const numberRegex = /[0-9]/;
+		if (numberRegex.test(city)) {
+			console.log("Found numbers in city name");
+			errors.push("Thành phố không chứa số.");
 		}
+		
+		// Kiểm tra ký tự đặc biệt (chỉ cho phép chữ cái, dấu cách, dấu gạch ngang, dấu nháy đơn)
+		// Loại trừ số khỏi kiểm tra ký tự đặc biệt
+		const specialCharRegex = /[^a-zA-ZÀ-ỹ\s\-'0-9]/;
+		if (specialCharRegex.test(city)) {
+			console.log("Found special characters in city name");
+			errors.push("Thành phố không chứa ký tự đặc biệt.");
+		}
+		
+		console.log("City validation errors:", errors);
+		return errors;
+	}
 
-		const n = parseInt(daysInput.value, 10);
-		if (!Number.isFinite(n) || n < 1 || n > 7) {
-			setStatus("Số ngày nhập không hợp lệ (1–7).", "error");
-			daysInput.focus();
+	let isSearching = false;
+
+	async function search() {
+		// Tránh gọi API nhiều lần cùng lúc
+		if (isSearching) {
+			console.log("Đang tìm kiếm, bỏ qua request này");
 			return;
 		}
+		
+		const city = (cityInput.value || "").trim();
+		const daysValue = daysInput.value.trim();
+		const n = parseFloat(daysValue);
+		
+		// Debug log
+		console.log("=== SEARCH START ===");
+		console.log("City:", city, "Days value:", daysValue, "Parsed n:", n);
+		console.log("Is integer?", Number.isInteger(n));
+		console.log("Validation check:", !daysValue || isNaN(n) || !Number.isInteger(n) || n < 1 || n > 7);
+		
+		// Thu thập tất cả lỗi validation (thành phố + ngày)
+		const allValidationErrors = [];
+		
+		// Kiểm tra thành phố
+		if (!city) {
+			allValidationErrors.push("Vui lòng nhập tên thành phố.");
+		} else {
+			// Kiểm tra validation thành phố nếu có nhập
+			const cityErrors = validateCityName(city);
+			allValidationErrors.push(...cityErrors);
+		}
+		
+		// Kiểm tra ngày
+		if (!daysValue || isNaN(n) || !Number.isInteger(n) || n < 1 || n > 7) {
+			allValidationErrors.push("Số ngày nhập không hợp lệ (1–7).");
+		}
+		
+		// Nếu có lỗi validation, hiển thị tất cả và dừng lại
+		if (allValidationErrors.length > 0) {
+			setStatus(allValidationErrors.join(" "), "error");
+			if (!city) cityInput.focus();
+			else daysInput.focus();
+			return;
+		}
+		
+		isSearching = true;
 		setStatus("Đang tải...");
+		
 		try {
-			const [currentResp, dailyResp] = await Promise.all([
+			console.log("🚀 Calling API...");
+			const [currentResp, hourlyResp, dailyResp] = await Promise.all([
 				fetchWeather("current", city),
+				fetchWeather("hourly", city),
 				fetchWeather("daily", city)
 			]);
+			console.log("✅ API calls successful");
+			
+			// Kiểm tra validation ngày ngay cả khi API thành công
+			if (!daysValue || isNaN(n) || !Number.isInteger(n) || n < 1 || n > 7) {
+				setStatus("Số ngày nhập không hợp lệ (1–7).", "error");
+				daysInput.focus();
+				return;
+			}
+			
 			renderCurrent(currentResp);
+			renderHourly(hourlyResp);
 			renderDaily(dailyResp);
 			setStatus("Hoàn tất.");
 		} catch (err) {
-			console.error(err);
+			console.error("API Error:", err);
+			
+			// Debug log trong catch
+			console.log("Catch block - daysValue:", daysValue, "n:", n);
+			
+			// Thu thập tất cả lỗi (API + validation ngày)
+			const allErrors = [];
+			
+			// Lỗi API
 			if (err && err.status === 400) {
-				setStatus("Thành phố không hợp lệ.", "error");
+				allErrors.push("Thành phố không tồn tại.");
 			} else {
-				setStatus(err.message || "Đã xảy ra lỗi.", "error");
+				allErrors.push(err.message || "Đã xảy ra lỗi.");
 			}
+			
+			// Lỗi validation ngày - kiểm tra số nguyên từ 1-7
+			if (!daysValue || isNaN(n) || !Number.isInteger(n) || n < 1 || n > 7) {
+				allErrors.push("Số ngày nhập không hợp lệ (1–7).");
+			}
+			
+			console.log("All errors:", allErrors);
+			console.log("Final error message:", allErrors.join(" "));
+			setStatus(allErrors.join(" "), "error");
+		} finally {
+			isSearching = false;
+			console.log("=== SEARCH END ===");
 		}
 	}
 
